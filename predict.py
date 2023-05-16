@@ -10,6 +10,7 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 import random
 
+# restore our data structures
 import pickle
 data = pickle.load( open( "models/training_data", "rb" ) )
 words = data['words']
@@ -17,6 +18,7 @@ classes = data['classes']
 train_x = data['train_x']
 train_y = data['train_y']
 
+# import intents file
 import json
 with open('data/intents.json') as json_data:
     intents = json.load(json_data)
@@ -72,17 +74,22 @@ def classify(sentence):
 
 def response(sentence, userID='1', show_details=False):
     results = classify(sentence)
-    if results:
+    print(results)
+    if not results:
+        return print("I don't understand. Please say again")
+    else:
         while results:
             for i in intents['intents']:
                 if i['tag'] == results[0][0]:
                     if 'context_set' in i:
                         if show_details: print ('context:', i['context_set'])
                         context[userID] = i['context_set']
-                    if not 'context_filter' in i or                         (userID in context and 'context_filter' in i and i['context_filter'] == context[userID]):
+                    if not 'context_filter' in i or (userID in context and 'context_filter' in i and i['context_filter'] == context[userID]):
                         if show_details: print ('tag:', i['tag'])
                         return print(random.choice(i['responses']))
 
             results.pop(0)
 
 response('I want to order')
+
+
